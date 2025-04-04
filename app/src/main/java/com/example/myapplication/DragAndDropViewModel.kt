@@ -10,13 +10,19 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class DragAndDropViewModel @Inject constructor(): ViewModel() {
+class DragAndDropViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(DragAndDropUiState())
     val uiState = _uiState.asStateFlow()
 
     fun updateState(event: DragAndDropEvent) {
         val dragEvent = event.toAndroidDragEvent()
-        val summary = "dragged x: ${dragEvent.x}, y: ${dragEvent.y}, label: ${dragEvent.clipData.description.label}"
+        val uri: String? = if (dragEvent.clipData.itemCount > 0) {
+            dragEvent.clipData.getItemAt(0).uri?.toString()
+        } else {
+            ""
+        }
+        val summary =
+            "dragged\n x: ${dragEvent.x}\ny: ${dragEvent.y}\n label: ${dragEvent.clipData.description.label} \n url: $uri"
         _uiState.update { it.copy(summary = summary) }
     }
 }
